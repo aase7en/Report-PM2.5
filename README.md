@@ -5,7 +5,7 @@
 [![Powered by Air4Thai API](https://img.shields.io/badge/data_source-air4thai-2CAF9F?logo=airplay-video&logoColor=white)](https://air4thai.pcd.go.th/)
 [![Built with Google Apps Script](https://img.shields.io/badge/built_with-Google%20Apps%20Script-4285F4?logo=google-cloud&logoColor=white)](https://developers.google.com/apps-script)
 
-[![Dashboard Preview](./images/Screenshot 2025-02-04 143521.png)<!-- ควรมีภาพตัวอย่าง -->
+[![Dashboard Preview](./images/Screenshot%202025-02-04%20143521.png)]
 
 ## ✨ คุณสมบัติหลัก
 - 📊 ดึงข้อมูล PM2.5 ทุก 1 ชั่วโมงจาก API ฟรี

@@ -1,7 +1,10 @@
 /** ค่าคงที่สำหรับการตั้งค่าระบบ */ 
 const CONFIG = {
   SPREADSHEET_ID: "1kBUKdezfAxIziq167e-RJV1nNZkeiaz6YQcpVAMja9w",
-  LINE_TOKEN: 'DVDfc5aTttR3eUCG1pJCKj0ANO2ZDrOqPeZXqKvL6AI',
+  LINE_TOKEN: [
+      'DVDfc5aTttR3eUCG1pJCKj0ANO2ZDrOqPeZXqKvL6AI',// Direct
+      '5mYp38Vlqd8KiYNkNZPFjjT43mv5SleerZ8Dko6pkDQ'// อสม
+  ],
   API_ENDPOINTS: {
     THAI_AIR: "http://air4thai.pcd.go.th/services/getNewAQI_JSON.php?stationID=21t",
     GLOBAL_AIR: "https://api.waqi.info/feed/A419398/?token=a5dec343b1b32382758bf6f2d07c3f4af6238ebc"
@@ -206,30 +209,33 @@ function sendLineNotification(message) {
     throw new AirQualityError('Invalid message object', 'NOTIFICATION_ERROR');
   }
 
-  const options = {
-    "method": 'post',
-    "headers": { 
-      "Authorization": "Bearer " + CONFIG.LINE_TOKEN 
-    },
-    "payload": {
-      "message": message.message,
-      "imageFile": message.imageFile
-    },
-    "muteHttpExceptions": true
-  };
+  // วนลูปสำหรับแต่ละ Line Token
+  CONFIG.LINE_TOKEN.forEach((token) => {
+    const options = {
+      "method": 'post',
+      "headers": { 
+        "Authorization": "Bearer " + token 
+      },
+      "payload": {
+        "message": message.message,
+        "imageFile": message.imageFile
+      },
+      "muteHttpExceptions": true
+    };
 
-  try {
-    const response = UrlFetchApp.fetch("https://notify-api.line.me/api/notify", options);
-    const responseCode = response.getResponseCode();
-    
-    if (responseCode !== 200) {
-      throw new Error(`Line API returned status code ${responseCode}`);
+    try {
+      const response = UrlFetchApp.fetch("https://notify-api.line.me/api/notify", options);
+      const responseCode = response.getResponseCode();
+
+      if (responseCode !== 200) {
+        throw new Error(`Line API returned status code ${responseCode} for token: ${token}`);
+      }
+
+      Logger.log(`Line notification sent successfully for token: ${token}`);
+    } catch (error) {
+      Logger.log(`Failed to send Line notification for token: ${token}. Error: ${error.message}`);
     }
-    
-    Logger.log("Line notification sent successfully");
-  } catch (error) {
-    throw new AirQualityError('Failed to send Line notification: ' + error.message, 'LINE_API_ERROR');
-  }
+  });
 }
 
 /** นำเข้าข้อมูลไปยัง Spreadsheet */
@@ -288,11 +294,26 @@ function handleError(error) {
   }
 }
 
-/** สร้าง Trigger สำหรับรันอัตโนมัติทุก 1 ชั่วโมง */
-function createHourlyTrigger() {
+/** สร้าง Trigger สำหรับรันอัตโนมัติทุก 6 และ 16 น. */
+function createDailyTrigger() {
+  // ลบ Trigger เดิมทั้งหมด
+  const triggers = ScriptApp.getProjectTriggers();
+  for (const trigger of triggers) {
+    ScriptApp.deleteTrigger(trigger);
+  }
+
+  // สร้าง Trigger ใหม่สำหรับเวลา 6:00 น. (GMT+7)
   ScriptApp.newTrigger('main')
     .timeBased()
-    .everyHours(1)
+    .atHour(6) // เวลา 6 โมงเช้า
+    .everyDays(1) // ทุกวัน
+    .create();
+
+  // สร้าง Trigger ใหม่สำหรับเวลา 16:00 น. (GMT+7)
+  ScriptApp.newTrigger('main')
+    .timeBased()
+    .atHour(16) // เวลา 4 โมงเย็น
+    .everyDays(1) // ทุกวัน
     .create();
 }
 

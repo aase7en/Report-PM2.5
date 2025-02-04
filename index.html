@@ -4,6 +4,16 @@
   <base target="_top">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&display=swap" rel="stylesheet">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
     .widget-container {
       display: flex;
       width: 432px;
@@ -33,10 +43,11 @@
     }
 
     .emoji {
-      width: 30px;
-      height: 30px;
+      width: 40px;
+      height: 40px;
       animation: bounce 2s infinite;
-      margin-right: 4px;
+      margin-right: 10px;
+      margin-top: 10px;
     }
 
     .pm-label {
@@ -63,7 +74,7 @@
     }
 
     .pm-unit {
-      font-size: 8px;
+      font-size: 9px;
       color: #333;
       margin-top: 2px;
     }
@@ -80,7 +91,7 @@
    }
 
    .recommendation-text {
-     font-size: 11px;
+     font-size: 15px;
      line-height: 1.2;
      color: #444;
      display: -webkit-box;
@@ -101,11 +112,13 @@
   <div class="widget-container">
     <div class="level-indicator">
       <div id="activeLevel" class="level-content">
-        <img id="emojiIcon" class="emoji" src="" alt="air quality emoji">
+        <div class="emoji-container">
+          <div class="loading-spinner"></div>
+          <img id="emojiIcon" class="emoji" src="" alt="air quality emoji" onload="this.classList.add('loaded'); this.previousElementSibling.classList.add('hidden');">
+        </div>
         <span class="pm-label">ค่าฝุ่น PM2.5</span>
       </div>
     </div>
-    <!-- เพิ่มส่วนแสดงค่า PM2.5 -->
     <div id="valueBox" class="value-display">
       <span id="pmValue" class="pm-value">--</span>
       <span class="pm-unit">µg/m³</span>
